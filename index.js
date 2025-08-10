@@ -9,7 +9,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Change to your frontend URL later
+    origin: "https://whatsapp-frontend-iota.vercel.app", // ✅ Allow only your Vercel frontend
+    methods: ["GET", "POST"],
   }
 });
 
@@ -17,9 +18,12 @@ const PORT = process.env.PORT || 5000;
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
-app.use(cors());
+app.use(cors({
+  origin: "https://whatsapp-frontend-iota.vercel.app" // ✅ Match frontend
+}));
 app.use(express.json());
 
+// 📌 Fetch all messages
 app.get('/api/messages', async (req, res) => {
   try {
     await client.connect();
@@ -32,6 +36,7 @@ app.get('/api/messages', async (req, res) => {
   }
 });
 
+// 📌 WebSocket Events
 io.on('connection', (socket) => {
   console.log(`🔌 Client connected: ${socket.id}`);
 
